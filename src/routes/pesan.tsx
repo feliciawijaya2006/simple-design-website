@@ -4,7 +4,7 @@ import { AREAS, PACKAGES, ADMIN_WA, rupiah, setSubs, fmtDate, addDays, type Pack
 
 export const Route = createFileRoute("/pesan")({
   validateSearch: (s: Record<string, unknown>): { paket?: PackageId } =>
-    s.paket && s.paket in PACKAGES ? { paket: s.paket as PackageId } : {},
+    typeof s["paket"] === "string" && s["paket"] in PACKAGES ? { paket: s["paket"] as PackageId } : {},
   head: () => ({
     meta: [
       { title: "Pesan Langganan — RantangKu" },
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/pesan")({
 function OrderPage() {
   const search = Route.useSearch();
   const [pkg, setPkg] = useState<PackageId>(search.paket ?? "20hari");
-  const [form, setForm] = useState({ name: "", phone: "", address: "", area: AREAS[0], notes: "", start: fmtDate(addDays(new Date(), 1)) });
+  const [form, setForm] = useState({ name: "", phone: "", address: "", area: AREAS[0] ?? "", notes: "", start: fmtDate(addDays(new Date(), 1)) });
   const [done, setDone] = useState<Subscription | null>(null);
   const p = PACKAGES[pkg];
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm({ ...form, [k]: e.target.value });

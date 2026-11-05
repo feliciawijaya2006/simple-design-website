@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import hero from "@/assets/hero-rantang.jpg";
-import { PACKAGES, WEEK_MENU, DAY_NAMES, rupiah } from "@/lib/catering";
+import { PACKAGES, WEEK_MENU, DAY_NAMES, rupiah, type PackageId } from "@/lib/catering";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -68,7 +68,7 @@ function Index() {
       <section className="mx-auto max-w-6xl px-4">
         <h2 className="text-3xl font-bold">Paket</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {Object.entries(PACKAGES).map(([id, p]) => (
+          {(Object.entries(PACKAGES) as [PackageId, (typeof PACKAGES)[PackageId]][]).map(([id, p]) => (
             <div key={id} className={`card-box flex flex-col ${id === "20hari" ? "border-primary ring-2 ring-primary" : ""}`}>
               {id === "20hari" && <span className="mb-2 w-fit rounded-full bg-warning-soft px-2 py-0.5 text-xs font-bold text-warning-foreground">Paling hemat</span>}
               <h3 className="text-2xl font-semibold">{p.name}</h3>

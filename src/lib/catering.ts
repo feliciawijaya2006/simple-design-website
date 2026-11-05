@@ -37,7 +37,7 @@ export const isWeekday = (d: Date) => d.getDay() >= 1 && d.getDay() <= 5;
 
 /** Skip for a date is allowed only before 20:00 the day before (H-1). */
 export function canSkip(target: string, now: Date): boolean {
-  const [y, m, d] = target.split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = target.split("-").map(Number);
   const deadline = new Date(y, m - 1, d - 1, SKIP_DEADLINE_HOUR, 0, 0);
   return now < deadline;
 }
