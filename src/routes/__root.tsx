@@ -12,6 +12,28 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { ADMIN_WA } from "../lib/catering";
+
+function SiteHeader() {
+  const links = [
+    { to: "/menu", label: "Menu" },
+    { to: "/pesan", label: "Pesan" },
+    { to: "/portal", label: "Portal Saya" },
+    { to: "/admin", label: "Admin" },
+  ] as const;
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <Link to="/" className="font-display text-2xl font-bold text-primary">RantangKu</Link>
+        <nav className="flex gap-1 overflow-x-auto text-sm font-medium">
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} className="rounded-full px-3 py-1.5 hover:bg-muted" activeProps={{ className: "bg-accent text-accent-foreground" }}>{l.label}</Link>
+          ))}
+        </nav>
+      </div>
+    </header>
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -78,16 +100,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "RantangKu — Katering Rantangan Harian" },
+      { name: "description", content: "Pesan katering rantangan harian & langganan dengan mudah." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" },
       {
         rel: "stylesheet",
         href: appCss,
@@ -121,7 +141,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteHeader />
+      <main className="min-h-[70vh]"><Outlet /></main>
+      <footer className="mt-16 border-t py-8 text-center text-sm text-muted-foreground">
+        © 2026 RantangKu · Masakan rumahan, diantar tiap hari
+      </footer>
+      <a href={`https://wa.me/${ADMIN_WA}`} target="_blank" rel="noreferrer" className="btn-primary fixed bottom-5 right-5 z-50 shadow-lg">💬 Tanya via WA</a>
     </QueryClientProvider>
   );
 }
