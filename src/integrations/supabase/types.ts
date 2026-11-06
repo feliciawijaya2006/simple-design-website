@@ -14,16 +14,264 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      deliveries: {
+        Row: {
+          delivered_at: string
+          delivery_date: string
+          id: string
+          portions: number
+          subscription_id: string
+        }
+        Insert: {
+          delivered_at?: string
+          delivery_date: string
+          id?: string
+          portions: number
+          subscription_id: string
+        }
+        Update: {
+          delivered_at?: string
+          delivery_date?: string
+          id?: string
+          portions?: number
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_bookings: {
+        Row: {
+          booking_date: string
+          created_at: string
+          id: string
+          portions: number
+          status: string
+          subscription_id: string
+        }
+        Insert: {
+          booking_date: string
+          created_at?: string
+          id?: string
+          portions: number
+          status?: string
+          subscription_id: string
+        }
+        Update: {
+          booking_date?: string
+          created_at?: string
+          id?: string
+          portions?: number
+          status?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_bookings_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_skips: {
+        Row: {
+          created_at: string
+          id: string
+          skip_date: string
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          skip_date: string
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          skip_date?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_skips_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string
+          area: string
+          created_at: string
+          full_name: string
+          id: string
+          notes: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          area?: string
+          created_at?: string
+          full_name: string
+          id: string
+          notes?: string
+          phone?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          area?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          order_code: string
+          paid: boolean
+          pkg: string
+          price: number
+          remaining_portions: number
+          start_date: string
+          status: string
+          total_portions: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_code?: string
+          paid?: boolean
+          pkg: string
+          price: number
+          remaining_portions: number
+          start_date: string
+          status?: string
+          total_portions: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_code?: string
+          paid?: boolean
+          pkg?: string
+          price?: number
+          remaining_portions?: number
+          start_date?: string
+          status?: string
+          total_portions?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_menus: {
+        Row: {
+          allergens: string[]
+          category: string
+          day: number
+          description: string
+          kcal: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          allergens?: string[]
+          category?: string
+          day: number
+          description?: string
+          kcal: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          allergens?: string[]
+          category?: string
+          day?: number
+          description?: string
+          kcal?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      book_flexible_meal: {
+        Args: { p_date: string; p_portions: number; p_subscription_id: string }
+        Returns: string
+      }
+      cancel_flexible_meal: {
+        Args: { p_booking_id: string }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      mark_meal_delivered: {
+        Args: { p_date: string; p_subscription_id: string }
+        Returns: undefined
+      }
+      toggle_meal_skip: {
+        Args: { p_date: string; p_subscription_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +398,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "customer"],
+    },
   },
 } as const
