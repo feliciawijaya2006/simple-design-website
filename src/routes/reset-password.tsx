@@ -37,17 +37,17 @@ function ResetPassword() {
     if (error) { setError(error.message); return; }
     await supabase.auth.signOut();
     setDone(true);
-    await navigate({ to: "/auth", replace: true });
+    await navigate({ to: "/auth", search: {}, replace: true });
   }
 
   return <div className="mx-auto max-w-md px-4 py-12"><div className="card-box">
     <h1 className="text-3xl font-bold">Kata sandi baru</h1>
-    {done ? <p className="mt-3">Kata sandi berhasil diubah. <Link to="/auth" className="font-semibold text-primary">Masuk sekarang</Link></p> :
+    {done ? <p className="mt-3">Kata sandi berhasil diubah. <Link to="/auth" search={{}} className="font-semibold text-primary">Masuk sekarang</Link></p> :
       <form onSubmit={submit} className="mt-6 space-y-4">
         <label className="block text-sm">Kata sandi baru<input required minLength={8} type="password" autoComplete="new-password" className="input-field mt-1" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
         {error && <p role="alert" className="rounded-lg bg-warning-soft p-3 text-sm text-warning-foreground">{error}</p>}
         <button disabled={!valid || busy} className="btn-primary w-full">{busy ? "Menyimpan…" : "Simpan kata sandi"}</button>
-        {!valid && <Link to="/auth" className="btn-outline w-full">Kembali ke halaman masuk</Link>}
+        {!valid && <Link to="/auth" search={{}} className="btn-outline w-full">Kembali ke halaman masuk</Link>}
       </form>}
   </div></div>;
 }
