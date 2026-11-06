@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSubs, updateSub, setSubs, markDelivered, needsMeal, isLowQuota, waInvoiceLink, PACKAGES, AREAS, WEEK_MENU, fmtDate, rupiah, type Subscription } from "@/lib/catering";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Dashboard Admin — RantangKu" },

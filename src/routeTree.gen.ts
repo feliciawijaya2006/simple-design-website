@@ -10,19 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as MenuRouteImport } from './routes/menu'
-import { Route as PesanRouteImport } from './routes/pesan'
-import { Route as PortalRouteImport } from './routes/portal'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPesanRouteImport } from './routes/_authenticated/pesan'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated/portal'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -30,53 +25,64 @@ const MenuRoute = MenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PesanRoute = PesanRouteImport.update({
-  id: '/pesan',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_authenticated/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPesanRoute = AuthenticatedPesanRouteImport.update({
+  id: '/_authenticated/pesan',
   path: '/pesan',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortalRoute = PortalRouteImport.update({
-  id: '/portal',
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/_authenticated/portal',
   path: '/portal',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/menu': typeof MenuRoute
-  '/pesan': typeof PesanRoute
-  '/portal': typeof PortalRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/pesan': typeof AuthenticatedPesanRoute
+  '/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/menu': typeof MenuRoute
-  '/pesan': typeof PesanRoute
-  '/portal': typeof PortalRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/pesan': typeof AuthenticatedPesanRoute
+  '/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
   '/menu': typeof MenuRoute
-  '/pesan': typeof PesanRoute
-  '/portal': typeof PortalRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/pesan': typeof AuthenticatedPesanRoute
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/menu' | '/pesan' | '/portal'
+  fullPaths: '/' | '/menu' | '/admin' | '/pesan' | '/portal'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/menu' | '/pesan' | '/portal'
-  id: '__root__' | '/' | '/admin' | '/menu' | '/pesan' | '/portal'
+  to: '/' | '/menu' | '/admin' | '/pesan' | '/portal'
+  id:
+    | '__root__'
+    | '/'
+    | '/menu'
+    | '/_authenticated/admin'
+    | '/_authenticated/pesan'
+    | '/_authenticated/portal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
   MenuRoute: typeof MenuRoute
-  PesanRoute: typeof PesanRoute
-  PortalRoute: typeof PortalRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedPesanRoute: typeof AuthenticatedPesanRoute
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -88,13 +94,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/menu': {
       id: '/menu'
       path: '/menu'
@@ -102,18 +101,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pesan': {
-      id: '/pesan'
-      path: '/pesan'
-      fullPath: '/pesan'
-      preLoaderRoute: typeof PesanRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portal': {
-      id: '/portal'
+    '/_authenticated/pesan': {
+      id: '/_authenticated/pesan'
+      path: '/pesan'
+      fullPath: '/pesan'
+      preLoaderRoute: typeof AuthenticatedPesanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
       path: '/portal'
       fullPath: '/portal'
-      preLoaderRoute: typeof PortalRouteImport
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -121,10 +127,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
   MenuRoute: MenuRoute,
-  PesanRoute: PesanRoute,
-  PortalRoute: PortalRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedPesanRoute: AuthenticatedPesanRoute,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

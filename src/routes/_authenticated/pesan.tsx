@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AREAS, PACKAGES, ADMIN_WA, rupiah, setSubs, fmtDate, addDays, type PackageId, type Subscription } from "@/lib/catering";
 
-export const Route = createFileRoute("/pesan")({
+export const Route = createFileRoute("/_authenticated/pesan")({
   validateSearch: (s: Record<string, unknown>): { paket?: PackageId } =>
     typeof s["paket"] === "string" && s["paket"] in PACKAGES ? { paket: s["paket"] as PackageId } : {},
   head: () => ({

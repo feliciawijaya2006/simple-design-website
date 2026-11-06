@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useSubs, updateSub, toggleSkip, canSkip, isLowQuota, PACKAGES, DAY_NAMES, ADMIN_WA, addDays, fmtDate, isWeekday, normPhone, rupiah } from "@/lib/catering";
 
-export const Route = createFileRoute("/portal")({
+export const Route = createFileRoute("/_authenticated/portal")({
   head: () => ({
     meta: [
       { title: "Portal Saya — RantangKu" },
