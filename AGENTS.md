@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application rules
+- Keep a single root auth subscriber and session-aware navigation; admin links come from the server-validated role, so customer and admin controls stay separate.
+- Cancel and clear query caches before signing out, then replace navigation with the auth page to prevent protected-data reuse.
