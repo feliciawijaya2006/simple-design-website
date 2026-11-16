@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 type Mode = "login" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({ redirect: typeof search["redirect"] === "string" && search["redirect"].startsWith("/") && !search["redirect"].startsWith("//") ? search["redirect"] : undefined }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => typeof search["redirect"] === "string" && search["redirect"].startsWith("/") && !search["redirect"].startsWith("//") ? { redirect: search["redirect"] } : {},
   head: () => ({ meta: [
     { title: "Masuk atau Daftar — RantangKu" },
     { name: "description", content: "Masuk ke Portal Saya atau dashboard admin RantangKu." },
