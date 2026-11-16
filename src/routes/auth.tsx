@@ -4,11 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { AREAS } from "@/lib/catering";
 import { getCurrentRole } from "@/lib/catering.functions";
+import { Button } from "@/components/ui/button";
 
 type Mode = "login" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({ redirect: typeof search["redirect"] === "string" && search["redirect"].startsWith("/") && !search["redirect"].startsWith("//") ? search["redirect"] : undefined }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => typeof search["redirect"] === "string" && search["redirect"].startsWith("/") && !search["redirect"].startsWith("//") ? { redirect: search["redirect"] } : {},
   head: () => ({ meta: [
     { title: "Masuk atau Daftar — RantangKu" },
     { name: "description", content: "Masuk ke Portal Saya atau dashboard admin RantangKu." },
@@ -80,8 +81,8 @@ function AuthPage() {
         <h1 className="mt-1 text-4xl font-bold">{mode === "signup" ? "Daftar pelanggan" : mode === "forgot" ? "Lupa kata sandi" : "Masuk ke akun"}</h1>
         <p className="mt-2 text-muted-foreground">Pelanggan dan admin otomatis diarahkan ke tampilan masing-masing.</p>
         <div className="mt-6 flex gap-1 rounded-full bg-muted p-1">
-          <button type="button" onClick={() => { setMode("login"); setError(""); setMessage(""); }} className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${mode !== "signup" ? "bg-card shadow" : ""}`}>Masuk</button>
-          <button type="button" onClick={() => { setMode("signup"); setError(""); setMessage(""); }} className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${mode === "signup" ? "bg-card shadow" : ""}`}>Daftar</button>
+          <Button variant="ghost" type="button" onClick={() => { setMode("login"); setError(""); setMessage(""); }} className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${mode !== "signup" ? "bg-card shadow" : ""}`}>Masuk</Button>
+          <Button variant="ghost" type="button" onClick={() => { setMode("signup"); setError(""); setMessage(""); }} className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold ${mode === "signup" ? "bg-card shadow" : ""}`}>Daftar</Button>
         </div>
         <form onSubmit={submit} className="mt-6 space-y-4">
           <label className="block text-sm">Email<input required type="email" autoComplete="email" className="input-field mt-1" value={form.email} onChange={set("email")} /></label>
@@ -95,10 +96,10 @@ function AuthPage() {
           </>}
           {error && <p role="alert" className="rounded-lg bg-warning-soft p-3 text-sm text-warning-foreground">{error}</p>}
           {message && <p role="status" className="rounded-lg bg-accent p-3 text-sm text-accent-foreground">{message}</p>}
-          <button disabled={busy} className="btn-primary w-full">{busy ? "Memproses…" : mode === "login" ? "Masuk" : mode === "signup" ? "Buat akun" : "Kirim tautan pemulihan"}</button>
+          <Button type="submit" disabled={busy} className="btn-primary h-auto w-full">{busy ? "Memproses…" : mode === "login" ? "Masuk" : mode === "signup" ? "Buat akun" : "Kirim tautan pemulihan"}</Button>
         </form>
-        {mode === "login" && <button type="button" className="mt-4 w-full text-sm font-semibold text-primary" onClick={() => { setMode("forgot"); setError(""); }}>Lupa kata sandi?</button>}
-        {mode === "forgot" && <button type="button" className="mt-4 w-full text-sm font-semibold text-primary" onClick={() => setMode("login")}>Kembali masuk</button>}
+        {mode === "login" && <Button variant="link" type="button" className="mt-4 w-full" onClick={() => { setMode("forgot"); setError(""); }}>Lupa kata sandi?</Button>}
+        {mode === "forgot" && <Button variant="link" type="button" className="mt-4 w-full" onClick={() => setMode("login")}>Kembali masuk</Button>}
       </div>
     </div>
   );

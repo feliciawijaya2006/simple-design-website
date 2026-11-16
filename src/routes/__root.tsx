@@ -4,31 +4,41 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useNavigate,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { getCurrentRole } from "@/lib/catering.functions";
+import { Button } from "@/components/ui/button";
+import { LogOut, ShieldCheck } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ADMIN_WA } from "../lib/catering";
 
-function SiteHeader() {
-  const links = [
+function SiteHeader({ user, admin, onSignOut, signingOut }: { user: User | null; admin: boolean; onSignOut: () => Promise<void>; signingOut: boolean }) {
+  const links = admin ? [
+    { to: "/admin", label: "Dashboard Admin" },
+    { to: "/menu", label: "Lihat Menu" },
+  ] as const : [
     { to: "/menu", label: "Menu" },
     { to: "/pesan", label: "Pesan" },
-    { to: "/portal", label: "Portal Saya" },
-    { to: "/admin", label: "Admin" },
+    ...(user ? [{ to: "/portal", label: "Portal Saya" } as const] : []),
   ] as const;
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link to="/" className="font-display text-2xl font-bold text-primary">RantangKu</Link>
-        <nav className="flex gap-1 overflow-x-auto text-sm font-medium">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <Link to={admin ? "/admin" : "/"} className="flex items-center gap-2 font-display text-2xl font-bold text-primary">RantangKu {admin && <ShieldCheck className="size-5" aria-label="Admin" />}</Link>
+        <nav aria-label={admin ? "Navigasi admin" : "Navigasi pelanggan"} className="flex flex-wrap items-center gap-1 text-sm font-medium">
           {links.map((l) => (
-            <Link key={l.to} to={l.to} className="rounded-full px-3 py-1.5 hover:bg-muted" activeProps={{ className: "bg-accent text-accent-foreground" }}>{l.label}</Link>
+            <Button key={l.to} asChild variant="ghost"><Link to={l.to} activeProps={{ className: "bg-accent text-accent-foreground" }}>{l.label}</Link></Button>
           ))}
+          {user ? <Button variant="outline" disabled={signingOut} onClick={onSignOut}><LogOut />{signingOut ? "Keluar…" : "Keluar"}</Button> : <Button asChild><Link to="/auth" search={{}}>Masuk / Daftar</Link></Button>}
         </nav>
       </div>
     </header>
@@ -123,7 +133,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <HeadContent />
       </head>
@@ -137,16 +147,54 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const navigate = useNavigate();
+  const fetchRole = useServerFn(getCurrentRole);
+  const [user, setUser] = useState<User | null>(null);
+  const [admin, setAdmin] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      setUser(session?.user ?? null);
+      if (event === "SIGNED_OUT") setAdmin(false);
+      void router.invalidate();
+      if (event !== "SIGNED_OUT") void queryClient.invalidateQueries();
+    });
+    void supabase.auth.getUser().then(({ data }) => { if (alive) setUser(data.user); }).catch(() => undefined);
+    return () => { alive = false; subscription.unsubscribe(); };
+  }, [router, queryClient]);
+
+  useEffect(() => {
+    let alive = true;
+    setAdmin(false);
+    if (user) void fetchRole().then((role) => { if (alive) setAdmin(role === "admin"); }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [user?.id, fetchRole]);
+
+  async function signOut() {
+    setSigningOut(true);
+    try {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null); setAdmin(false);
+      await navigate({ to: "/auth", search: {}, replace: true });
+    } finally { setSigningOut(false); }
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <SiteHeader />
+      <SiteHeader user={user} admin={admin} onSignOut={signOut} signingOut={signingOut} />
       <main className="min-h-[70vh]"><Outlet /></main>
       <footer className="mt-16 border-t py-8 text-center text-sm text-muted-foreground">
         © 2026 RantangKu · Masakan rumahan, diantar tiap hari
       </footer>
-      <a href={`https://wa.me/${ADMIN_WA}`} target="_blank" rel="noreferrer" className="btn-primary fixed bottom-5 right-5 z-50 shadow-lg">💬 Tanya via WA</a>
+      {!admin && <a href={`https://wa.me/${ADMIN_WA}`} target="_blank" rel="noreferrer" className="btn-primary fixed bottom-5 right-5 z-50 shadow-lg">💬 Tanya via WA</a>}
     </QueryClientProvider>
   );
 }
